@@ -25,6 +25,7 @@ class ApiService {
     const token = this.getToken();
     const headers: Record<string, string> = {
       Accept: 'application/json',
+      'Bypass-Tunnel-Reminder': 'true',
       ...(options.headers as Record<string, string>),
     };
 
@@ -175,7 +176,9 @@ class ApiService {
     },
     downloadPdf: async (id: string, filename?: string) => {
       const token = localStorage.getItem('vc_auth_token');
-      const headers: Record<string, string> = {};
+      const headers: Record<string, string> = {
+        'Bypass-Tunnel-Reminder': 'true',
+      };
       if (token) {
         headers['Authorization'] = `Bearer ${token}`;
       }
