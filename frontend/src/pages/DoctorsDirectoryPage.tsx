@@ -18,6 +18,7 @@ import {
   Calendar,
   MapPin,
   Filter,
+  AlertCircle,
 } from 'lucide-react';
 import { Modal } from '../components/Modal';
 import { useAuth } from '../context/AuthContext';
@@ -29,6 +30,7 @@ export const DoctorsDirectoryPage: React.FC = () => {
   const [selectedSpec, setSelectedSpec] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [fetchError, setFetchError] = useState<string>('');
 
   // Booking Modal State
   const [bookingDoctor, setBookingDoctor] = useState<Doctor | null>(null);
@@ -41,6 +43,7 @@ export const DoctorsDirectoryPage: React.FC = () => {
 
   const loadData = async () => {
     setIsLoading(true);
+    setFetchError('');
     try {
       const [docRes, specRes]: any = await Promise.all([
         api.doctors.list({
@@ -52,8 +55,8 @@ export const DoctorsDirectoryPage: React.FC = () => {
 
       if (docRes?.data) setDoctors(docRes.data);
       if (specRes?.data) setSpecializations(specRes.data);
-    } catch {
-      // Fallback
+    } catch (err: any) {
+      setFetchError(err.message || 'Unable to connect to the medical server. Please ensure the backend is reachable.');
     } finally {
       setIsLoading(false);
     }
@@ -166,6 +169,22 @@ export const DoctorsDirectoryPage: React.FC = () => {
           ))}
         </div>
       </div>
+
+      {/* Network / Connection Error Banner */}
+      {fetchError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-2xl flex items-center justify-between text-xs font-semibold">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
+            <span>{fetchError}</span>
+          </div>
+          <button
+            onClick={() => loadData()}
+            className="bg-red-100 hover:bg-red-200 text-red-800 px-3 py-1 rounded-lg transition"
+          >
+            Retry
+          </button>
+        </div>
+      )}
 
       {/* 2. Doctor Cards Grid */}
       {isLoading ? (
