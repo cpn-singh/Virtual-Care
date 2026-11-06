@@ -26,6 +26,7 @@ class ApiService {
     const headers: Record<string, string> = {
       Accept: 'application/json',
       'Bypass-Tunnel-Reminder': 'true',
+      'ngrok-skip-browser-warning': 'true',
       ...(options.headers as Record<string, string>),
     };
 

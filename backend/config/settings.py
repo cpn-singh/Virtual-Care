@@ -175,6 +175,7 @@ CSRF_TRUSTED_ORIGINS = [
     'https://*.vercel.app',
     'https://*.loca.lt',
     'https://*.ngrok-free.app',
+    'https://*.ngrok-free.dev',
     'https://*.trycloudflare.com',
 ]
 
