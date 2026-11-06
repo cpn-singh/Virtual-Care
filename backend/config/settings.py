@@ -156,6 +156,8 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'common.exceptions.custom_exception_handler',
 }
 
+from corsheaders.defaults import default_headers
+
 # CORS Configuration for React Frontend (supports local Vite, Vercel deployments, & public tunnels)
 CORS_ALLOW_ALL_ORIGINS = DEBUG or os.getenv('CORS_ALLOW_ALL_ORIGINS', 'False').lower() in ('true', '1')
 CORS_ALLOWED_ORIGINS = [
@@ -168,6 +170,12 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
     r"^https:\/\/.*\.vercel\.app$",
 ]
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'ngrok-skip-browser-warning',
+    'bypass-tunnel-reminder',
+    'bypasstunnelreminder',
+    'ngrokskipbrowserwarning',
+]
 
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:3000',
