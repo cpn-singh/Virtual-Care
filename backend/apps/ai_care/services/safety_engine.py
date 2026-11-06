@@ -94,6 +94,20 @@ class SafetyEngine:
             )
             return reply_data
 
+        # Step 2b: Medication & Generic Replacement Inquiry Handling
+        if SafetyEngine._is_medicine_or_replacement_query(combined_text):
+            reply_data = SafetyEngine._handle_unrecognized_medicine_query(user_text)
+            AIMessage.objects.create(
+                conversation=conversation,
+                role=AIMessage.ROLE_ASSISTANT,
+                content=reply_data["message"],
+                category=reply_data["category"],
+                urgency=reply_data["urgency"],
+                emergency_action_required=False,
+                recommended_next_step=reply_data["recommended_next_step"]
+            )
+            return reply_data
+
         # Step 3: Multi-Step Symptom Intake Workflow
         reply_data = SafetyEngine._handle_conversational_intake(conversation, user_text)
         AIMessage.objects.create(
@@ -200,6 +214,60 @@ class SafetyEngine:
             "detected_medicines": meds,
             "detected_lab_findings": labs,
             "draft_prescription": draft_rx_items,
+            "can_book_in_chat": True,
+            "recommended_doctor": recommended_doc,
+            "disclaimer": SAFETY_DISCLAIMER
+        }
+
+    @staticmethod
+    def _is_medicine_or_replacement_query(text: str) -> bool:
+        t = text.lower()
+        pharma_words = ["generic", "replacement", "substitute", "alternative", "replace"]
+        med_words = ["taking", "medicine", "tablet", "syrup", "capsule", "dosage", "side effect", "drug", "prescription"]
+        return any(w in t for w in pharma_words) or (
+            any(w in t for w in ["taking", "prescribed", "dose"]) and any(w in t for w in med_words)
+        )
+
+    @staticmethod
+    def _handle_unrecognized_medicine_query(user_text: str) -> dict:
+        import re
+        doctor = DoctorProfile.objects.filter(is_verified=True).select_related('user', 'specialization').first()
+        recommended_doc = None
+        if doctor:
+            recommended_doc = {
+                "id": str(doctor.id),
+                "name": f"Dr. {doctor.user.full_name}",
+                "specialization": doctor.specialization.name if doctor.specialization else "General Physician",
+                "consultation_fee": str(doctor.consultation_fee),
+                "rating": str(doctor.rating),
+                "qualifications": doctor.qualifications,
+                "city": doctor.city
+            }
+
+        match = re.search(r'(?:taking|for|of|replace|substitute|alternative to)\s+([a-zA-Z0-9\s\-]+?)(?:\.|\?|\bis\b|\bfor\b|$)', user_text, re.IGNORECASE)
+        med_name = match.group(1).strip() if match else "your queried medication"
+
+        message = (
+            f"### 💊 Medication & Generic Replacement Guidance\n\n"
+            f"Regarding **{med_name}** and generic alternatives:\n\n"
+            f"1. **Understanding Generic Substitutes:**\n"
+            f"   - A generic medicine contains the **identical active chemical molecule (API)**, strength, and therapeutic efficacy as the branded version, but typically costs **50% to 80% less**.\n"
+            f"   - Check the **generic salt name** printed in smaller font right under the brand name on the strip or bottle.\n\n"
+            f"2. **Herbal vs. Allopathic Formulations:**\n"
+            f"   - If your medication is an **Ayurvedic/Herbal formulation** (such as herbal cough syrups or immunity tonics), look for equivalent classical herbal formulations containing similar botanical extracts (like Vasa, Tulsi, Mulethi, or Honey).\n"
+            f"   - If you need a targeted **allopathic pharmaceutical alternative** (e.g. for wet productive cough vs. dry allergic cough), an exact molecular substitute (like Ambroxol, Levosalbutamol, or Dextromethorphan) may be recommended based on your specific clinical presentation.\n\n"
+            f"3. **Clinical Recommendation:**\n"
+            f"   - Before switching medications, consult a certified doctor to confirm the exact active molecule, dosage, and ensure there are no adverse drug interactions.\n\n"
+            f"Would you like to book a quick video review with a verified clinician to review this medicine and get an authorized prescription?"
+        )
+
+        return {
+            "message": message,
+            "category": "pharmacology_consultation",
+            "urgency": "routine",
+            "recommended_next_step": "book_doctor_appointment",
+            "needs_human_review": True,
+            "emergency_action_required": False,
             "can_book_in_chat": True,
             "recommended_doctor": recommended_doc,
             "disclaimer": SAFETY_DISCLAIMER

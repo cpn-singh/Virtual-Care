@@ -296,6 +296,138 @@ MEDICINE_DATABASE = {
                 "typical_use": "Direct bioequivalent brand alternative with same microgram strength."
             }
         ]
+    },
+    "jufex_forte": {
+        "generic_name": "Jufex Forte (Herbal Formulation: Vasa, Tulsi, Mulethi, Pippali, Baheda)",
+        "aliases": ["jufex forte", "jufex", "jufex syrup", "jufex forte syrup", "aimil jufex"],
+        "primary_disease": "Viral Respiratory Tract Infections, Allergic & Productive Cough, Bronchitis",
+        "therapeutic_class": "Ayurvedic Mucolytic & Bronchodilator Cough Formulation",
+        "mechanism_of_action": "Relieves bronchospasm, liquefies thick mucus secretions (mucolytic action), soothes inflamed pharyngeal mucosa, and exerts natural antiviral, antimicrobial, and immune-protective action on the respiratory tract.",
+        "standard_dosage": "10 ml (2 teaspoonfuls) twice or thrice daily with lukewarm water",
+        "formulation": "Herbal Oral Syrup",
+        "equivalent_alternatives": [
+            {
+                "name": "Dabur Honitus Syrup / Himalaya Koflet",
+                "class": "Herbal / Ayurvedic Cough Formulation",
+                "how_it_works": "Formulated with Honey, Tulsi, Mulethi, and Banapsha; provides non-drowsy soothing relief for throat tickle and viral dry/wet cough.",
+                "typical_use": "Direct OTC herbal generic equivalent for mild-to-moderate cough and throat irritation without drowsiness."
+            },
+            {
+                "name": "Ambroxol + Levosalbutamol + Guaiphenesin (e.g. Generic Ascoril LS / Asthalin AX)",
+                "class": "Allopathic Mucolytic & Bronchodilator (For Productive / Wet Cough)",
+                "how_it_works": "Ambroxol breaks down thick phlegm, Levosalbutamol dilates airways to ease breathing, and Guaiphenesin clears mucus out of bronchial tubes.",
+                "typical_use": "Prescribed by clinicians if you have a heavy chesty cough with thick sputum or rattling chest congestion."
+            },
+            {
+                "name": "Dextromethorphan Hydrobromide + Chlorpheniramine (e.g. Generic Benadryl DR / Ascoril D)",
+                "class": "Allopathic Antitussive & Antihistamine (For Dry / Allergic Cough)",
+                "how_it_works": "Acts on the cough center in the brain to suppress persistent coughing spasms and blocks allergic histamine triggers in the throat.",
+                "typical_use": "Prescribed by clinicians if your cough is predominantly dry, hacking, allergic, or disrupts sleep at night."
+            }
+        ]
+    },
+    "ascoril_ls": {
+        "generic_name": "Ambroxol + Levosalbutamol + Guaiphenesin",
+        "aliases": ["ascoril ls", "ascoril", "grilinctus ls", "bro-zedex", "solvin ls"],
+        "primary_disease": "Productive / Wet Chesty Cough & Bronchial Asthma with Mucus",
+        "therapeutic_class": "Mucolytic, Bronchodilator & Expectorant",
+        "mechanism_of_action": "Levosalbutamol relaxes bronchial smooth muscle, Ambroxol breaks down mucopolysaccharide fibers in sputum, and Guaiphenesin stimulates respiratory tract fluid flow to expel mucus.",
+        "standard_dosage": "10 ml (2 teaspoonfuls) orally thrice daily after meals",
+        "formulation": "Oral Syrup",
+        "equivalent_alternatives": [
+            {
+                "name": "Asthalin AX / Macbery LS (Generic Equivalent Brands)",
+                "class": "Levosalbutamol + Ambroxol + Guaiphenesin",
+                "how_it_works": "Same triple active chemical molecules with exact same expectorant mechanism at a lower generic cost.",
+                "typical_use": "Direct generic alternative for wet chesty cough."
+            },
+            {
+                "name": "Jufex Forte / Dabur Honitus",
+                "class": "Herbal Mucolytic Cough Formulation",
+                "how_it_works": "Uses Vasa and Mulethi to thin phlegm naturally without synthetic bronchodilator palpitations.",
+                "typical_use": "Herbal non-stimulant alternative for mild-to-moderate cough."
+            }
+        ]
+    },
+    "benadryl_dr": {
+        "generic_name": "Dextromethorphan Hydrobromide + Chlorpheniramine Maleate",
+        "aliases": ["benadryl dr", "benadryl", "ascoril d", "toscano", "chericof"],
+        "primary_disease": "Dry, Hacking, Non-productive & Allergic Cough",
+        "therapeutic_class": "Centrally-acting Antitussive + H1-Antihistamine",
+        "mechanism_of_action": "Dextromethorphan elevates the cough threshold in the medullary cough center, while Chlorpheniramine blocks peripheral H1 receptors, reducing throat tickle and allergic drainage.",
+        "standard_dosage": "5 ml to 10 ml orally every 6 to 8 hours as needed",
+        "formulation": "Oral Syrup",
+        "equivalent_alternatives": [
+            {
+                "name": "Alex Syrup / Zedex D (Generic Equivalent Brands)",
+                "class": "Dextromethorphan + Chlorpheniramine",
+                "how_it_works": "Bioequivalent central cough suppressant with identical active ingredients.",
+                "typical_use": "Direct generic substitute for nighttime dry cough."
+            }
+        ]
+    },
+    "montair_lc": {
+        "generic_name": "Montelukast Sodium + Levocetirizine Hydrochloride",
+        "aliases": ["montair lc", "montair", "montek lc", "telekast l", "levocet m"],
+        "primary_disease": "Allergic Rhinitis, Seasonal Allergies & Allergic Bronchial Asthma",
+        "therapeutic_class": "Leukotriene Receptor Antagonist (LTRA) + Antihistamine",
+        "mechanism_of_action": "Montelukast competitively blocks cysteinyl leukotriene CysLT1 receptors reducing airway edema and eosinophilic inflammation, while Levocetirizine blocks histamine H1 receptors preventing sneezing, runny nose, and itchy eyes.",
+        "standard_dosage": "10 mg Montelukast + 5 mg Levocetirizine once daily at bedtime",
+        "formulation": "Film-coated Tablet",
+        "equivalent_alternatives": [
+            {
+                "name": "Monticope / Odimont LC (Generic Equivalents)",
+                "class": "Montelukast + Levocetirizine",
+                "how_it_works": "Same dual-action allergic pathway inhibitor at a generic price.",
+                "typical_use": "Direct generic substitute for chronic allergy and allergic cough."
+            }
+        ]
+    },
+    "pantoprazole": {
+        "generic_name": "Pantoprazole Sodium",
+        "aliases": ["pantoprazole", "pan 40", "pantocid", "pan-d", "pantop"],
+        "primary_disease": "Gastroesophageal Reflux Disease (GERD), Acidity & Peptic Ulceration",
+        "therapeutic_class": "Proton Pump Inhibitor (PPI)",
+        "mechanism_of_action": "Suppresses the final step in gastric acid production by covalently binding to the (H+, K+)-ATPase enzyme system at the secretory surface of the gastric parietal cell.",
+        "standard_dosage": "40 mg orally once daily in the morning 30-60 minutes before breakfast",
+        "formulation": "Enteric-coated Tablet",
+        "equivalent_alternatives": [
+            {
+                "name": "Rabeprazole (e.g. Razo 20)",
+                "class": "Proton Pump Inhibitor",
+                "how_it_works": "Faster onset of gastric acid suppression compared to Pantoprazole.",
+                "typical_use": "Direct equivalent for severe acid reflux and heartburn."
+            },
+            {
+                "name": "Omeprazole (e.g. Omez 20)",
+                "class": "Proton Pump Inhibitor",
+                "how_it_works": "Standard high-affinity PPI with decades of proven acid reduction.",
+                "typical_use": "Cost-effective generic alternative for daily GERD control."
+            }
+        ]
+    },
+    "combiflam": {
+        "generic_name": "Ibuprofen + Paracetamol",
+        "aliases": ["combiflam", "flexon", "ibugesic plus", "brufen plus"],
+        "primary_disease": "Acute Pain, Dental Ache, Body Pain, Headache & High Fever",
+        "therapeutic_class": "Non-steroidal Anti-inflammatory Drug (NSAID) + Antipyretic",
+        "mechanism_of_action": "Ibuprofen inhibits cyclooxygenase enzymes (COX-1 and COX-2) to reduce peripheral inflammatory prostaglandins, while Paracetamol acts on central pain and thermoregulatory centers.",
+        "standard_dosage": "1 tablet orally with or after food up to thrice daily as needed",
+        "formulation": "Tablet",
+        "equivalent_alternatives": [
+            {
+                "name": "Aceclofenac + Paracetamol (e.g. Zerodol-P)",
+                "class": "Preferential COX-2 NSAID + Paracetamol",
+                "how_it_works": "Targets inflammatory cytokines with slightly lower gastrointestinal irritation compared to Ibuprofen.",
+                "typical_use": "Preferred alternative for joint, back, or post-dental pain."
+            },
+            {
+                "name": "Plain Paracetamol 650 mg (e.g. Dolo 650 / Calpol)",
+                "class": "Pure Analgesic & Antipyretic",
+                "how_it_works": "Relieves pain and fever without any stomach ulceration risk from NSAIDs.",
+                "typical_use": "Safe alternative for patients with sensitive stomachs or acid reflux."
+            }
+        ]
     }
 }
 
