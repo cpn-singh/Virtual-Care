@@ -38,6 +38,11 @@ import {
   Clock,
   Star,
   Sparkles,
+  Mic,
+  MicOff,
+  Volume2,
+  Square,
+  Languages,
 } from 'lucide-react';
 
 export const AICareAssistantPage: React.FC = () => {
@@ -65,6 +70,119 @@ export const AICareAssistantPage: React.FC = () => {
   const [bookingLoading, setBookingLoading] = useState<boolean>(false);
   const [bookedAppointmentId, setBookedAppointmentId] = useState<string | null>(null);
   const [bookingError, setBookingError] = useState<string>('');
+
+  // Voice Input (Microphone) & Speech Synthesis (Audio Readout) State
+  const [isListening, setIsListening] = useState<boolean>(false);
+  const [speechLang, setSpeechLang] = useState<'hi-IN' | 'en-IN'>('hi-IN');
+  const [speakingMessageId, setSpeakingMessageId] = useState<string | null>(null);
+  const recognitionRef = useRef<any>(null);
+
+  // Clean up speech synthesis & recognition on unmount
+  useEffect(() => {
+    return () => {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {}
+      }
+    };
+  }, []);
+
+  const toggleListening = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert('Speech recognition is not supported in this browser. Please use Google Chrome, Edge, or Safari.');
+      return;
+    }
+
+    if (isListening) {
+      if (recognitionRef.current) {
+        try {
+          recognitionRef.current.stop();
+        } catch {}
+      }
+      setIsListening(false);
+      return;
+    }
+
+    try {
+      const recognition = new SpeechRecognition();
+      recognitionRef.current = recognition;
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = speechLang;
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event: any) => {
+        const transcript = Array.from(event.results)
+          .map((result: any) => result[0].transcript)
+          .join('');
+        setInputMessage(transcript);
+      };
+
+      recognition.onerror = (event: any) => {
+        console.warn('Speech recognition warning/error:', event.error);
+        setIsListening(false);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } catch (err) {
+      console.error('Failed to start speech recognition:', err);
+      setIsListening(false);
+    }
+  };
+
+  const toggleSpeak = (messageId: string, text: string) => {
+    if (!('speechSynthesis' in window)) {
+      alert('Text-to-speech audio is not supported in this browser.');
+      return;
+    }
+
+    if (speakingMessageId === messageId) {
+      window.speechSynthesis.cancel();
+      setSpeakingMessageId(null);
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+    setSpeakingMessageId(messageId);
+
+    // Strip markdown formatting for clear natural voice
+    const cleanSpeech = text
+      .replace(/[#*•&bull;_`]/g, '')
+      .replace(/🚨|⚠️|💊|🔬|💡|✅/g, '')
+      .replace(/\n+/g, '. ')
+      .trim();
+
+    const utterance = new SpeechSynthesisUtterance(cleanSpeech);
+
+    const isHindiText = /[\u0900-\u097F]/.test(cleanSpeech);
+    utterance.lang = isHindiText ? 'hi-IN' : 'en-IN';
+    utterance.rate = 0.95;
+
+    const voices = window.speechSynthesis.getVoices();
+    const matchingVoice = voices.find((v) =>
+      isHindiText ? v.lang.includes('hi') : v.lang.includes('en-IN') || v.lang.includes('en')
+    );
+    if (matchingVoice) {
+      utterance.voice = matchingVoice;
+    }
+
+    utterance.onend = () => setSpeakingMessageId(null);
+    utterance.onerror = () => setSpeakingMessageId(null);
+
+    window.speechSynthesis.speak(utterance);
+  };
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -322,6 +440,30 @@ export const AICareAssistantPage: React.FC = () => {
                 >
                   <div>{msg.content}</div>
 
+                  {/* Audio Listen Button for Assistant Messages */}
+                  {!isUser && (
+                    <div className="pt-1 flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => toggleSpeak(msg.id, msg.content)}
+                        className="inline-flex items-center gap-1.5 text-[11px] text-teal-700 hover:text-teal-900 bg-teal-50 hover:bg-teal-100 px-2.5 py-1 rounded-lg transition font-medium border border-teal-200/60 shadow-2xs"
+                        title={speakingMessageId === msg.id ? 'Stop audio / रोकें' : 'Listen aloud (आवाज में सुनें)'}
+                      >
+                        {speakingMessageId === msg.id ? (
+                          <>
+                            <Square className="w-3 h-3 text-red-600 fill-red-600 animate-pulse" />
+                            <span className="text-red-700 font-bold">Stop Audio / रोकें</span>
+                          </>
+                        ) : (
+                          <>
+                            <Volume2 className="w-3.5 h-3.5 text-teal-600" />
+                            <span>Listen in Audio / सुनें 🔊</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+
                   {/* 1. Pharmacology & Medicine Detection Intelligence Card */}
                   {!isUser && msg.detected_medicines && msg.detected_medicines.length > 0 && (
                     <div className="mt-3 pt-3 border-t border-slate-200 space-y-3">
@@ -552,7 +694,7 @@ export const AICareAssistantPage: React.FC = () => {
           </div>
         )}
 
-        {/* Input Bar with Attachment Option */}
+        {/* Input Bar with Voice (Mic), Language Selector, and Attachment */}
         <form onSubmit={handleSendMessage} className="p-3 border-t border-slate-200 bg-white flex items-center gap-2">
           {/* Hidden File Input supporting PDF, DOC/DOCX, Images, TXT */}
           <input
@@ -563,32 +705,77 @@ export const AICareAssistantPage: React.FC = () => {
             className="hidden"
           />
 
+          {/* Attachment Button */}
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="p-2.5 rounded-xl border border-slate-300 text-slate-600 hover:text-teal-700 hover:bg-slate-50 transition"
+            className="p-2.5 rounded-xl border border-slate-300 text-slate-600 hover:text-teal-700 hover:bg-slate-50 transition shrink-0"
             title="Attach medical report, medicine list, image or PDF"
           >
             <Paperclip className="w-4 h-4" />
           </button>
 
+          {/* Language Toggle: EN / हिंदी */}
+          <button
+            type="button"
+            onClick={() => setSpeechLang((prev) => (prev === 'hi-IN' ? 'en-IN' : 'hi-IN'))}
+            className={`px-2.5 py-1.5 rounded-xl border text-xs font-bold transition shrink-0 flex items-center gap-1 shadow-2xs ${
+              speechLang === 'hi-IN'
+                ? 'bg-emerald-50 border-emerald-300 text-emerald-800'
+                : 'bg-slate-50 border-slate-300 text-slate-700'
+            }`}
+            title="Toggle Speech Language: Hindi (हिंदी) or English"
+          >
+            <Languages className="w-3.5 h-3.5" />
+            <span>{speechLang === 'hi-IN' ? 'हिंदी' : 'EN'}</span>
+          </button>
+
+          {/* Voice Input Microphone Button */}
+          <button
+            type="button"
+            onClick={toggleListening}
+            className={`p-2.5 rounded-xl border transition shrink-0 flex items-center justify-center ${
+              isListening
+                ? 'bg-red-500 text-white border-red-600 animate-pulse ring-4 ring-red-200 shadow-md'
+                : 'border-slate-300 text-slate-600 hover:text-teal-700 hover:bg-teal-50'
+            }`}
+            title={
+              isListening
+                ? 'Listening... Click to stop (सुन रहा हूँ... रोकने के लिए क्लिक करें)'
+                : `Click to speak in ${speechLang === 'hi-IN' ? 'Hindi (हिंदी में बोलें)' : 'English'}`
+            }
+          >
+            {isListening ? <Mic className="w-4 h-4 animate-bounce" /> : <Mic className="w-4 h-4" />}
+          </button>
+
+          {/* Input text field */}
           <input
             type="text"
             placeholder={
-              selectedFile
+              isListening
+                ? speechLang === 'hi-IN'
+                  ? '🎙️ सुन रहा हूँ... अब हिंदी में बोलिए...'
+                  : '🎙️ Listening... Speak now in English...'
+                : selectedFile
                 ? 'Add a message or press Send to analyze this file...'
-                : 'Describe symptoms or mention medicines (e.g. Metformin, Amlodipine)...'
+                : speechLang === 'hi-IN'
+                ? 'लक्षण बताएं या दवाई का नाम पूछें (जैसे जुफेक्स, बुखार, खांसी)...'
+                : 'Describe symptoms or mention medicines (e.g. Jufex, Metformin)...'
             }
             value={inputMessage}
             onChange={(e) => setInputMessage(e.target.value)}
             disabled={isSending}
-            className="flex-1 text-xs sm:text-sm border border-slate-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-slate-100"
+            className={`flex-1 text-xs sm:text-sm border rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:bg-slate-100 transition ${
+              isListening
+                ? 'border-red-400 bg-red-50/40 text-red-950 placeholder-red-500 font-medium'
+                : 'border-slate-300'
+            }`}
           />
 
           <button
             type="submit"
             disabled={isSending || (!inputMessage.trim() && !selectedFile)}
-            className="bg-teal-600 hover:bg-teal-700 disabled:bg-slate-300 text-white font-semibold px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 text-xs sm:text-sm"
+            className="bg-teal-600 hover:bg-teal-700 disabled:bg-slate-300 text-white font-semibold px-4 py-2.5 rounded-xl transition flex items-center gap-1.5 text-xs sm:text-sm shrink-0"
           >
             <Send className="w-4 h-4" />
             <span className="hidden sm:inline">Send</span>

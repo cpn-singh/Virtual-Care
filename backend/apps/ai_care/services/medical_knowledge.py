@@ -299,7 +299,7 @@ MEDICINE_DATABASE = {
     },
     "jufex_forte": {
         "generic_name": "Jufex Forte (Herbal Formulation: Vasa, Tulsi, Mulethi, Pippali, Baheda)",
-        "aliases": ["jufex forte", "jufex", "jufex syrup", "jufex forte syrup", "aimil jufex"],
+        "aliases": ["jufex forte", "jufex", "jufex syrup", "jufex forte syrup", "aimil jufex", "जुफेक्स फोर्टे", "जुफेक्स", "जुफेक्स सिरप"],
         "primary_disease": "Viral Respiratory Tract Infections, Allergic & Productive Cough, Bronchitis",
         "therapeutic_class": "Ayurvedic Mucolytic & Bronchodilator Cough Formulation",
         "mechanism_of_action": "Relieves bronchospasm, liquefies thick mucus secretions (mucolytic action), soothes inflamed pharyngeal mucosa, and exerts natural antiviral, antimicrobial, and immune-protective action on the respiratory tract.",
