@@ -6,7 +6,12 @@
  * and descriptive error propagation.
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  import.meta.env.VITE_APT_BASE_URL ||
+  (import.meta.env.PROD
+    ? 'https://interlobate-isidro-palmately.ngrok-free.dev/api/v1'
+    : 'http://localhost:8000/api/v1');
 
 class ApiService {
   private getToken(): string | null {
