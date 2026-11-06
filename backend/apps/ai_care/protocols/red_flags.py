@@ -14,61 +14,75 @@ import re
 # Comprehensive list of acute red flags requiring immediate physical emergency services
 RED_FLAG_CATEGORIES = {
     "cardiac": {
-        "label": "Potential Acute Cardiac Event",
+        "label": "Potential Acute Cardiac Event / हृदय संबंधी आपातकाल",
         "keywords": [
             "chest pain", "crushing pain", "chest tightness", "chest pressure",
             "pain radiating to left arm", "pain radiating to jaw", "heart attack",
-            "crushing chest", "heart stopping"
+            "crushing chest", "heart stopping",
+            "seene me dard", "chhati me dard", "dil ka daura", "chhati me dabav",
+            "छाती में दर्द", "सीने में दर्द", "हार्ट अटैक", "दिल का दौरा"
         ],
-        "guidance": "Severe or crushing chest pain can indicate a cardiac emergency requiring urgent medical evaluation."
+        "guidance": "Severe or crushing chest pain can indicate a cardiac emergency requiring urgent medical evaluation. / सीने में तेज दर्द हृदय आपातकाल का संकेत हो सकता है, तुरंत अस्पताल जाएं।"
     },
     "respiratory": {
-        "label": "Severe Respiratory Distress",
+        "label": "Severe Respiratory Distress / सांस लेने में गंभीर तकलीफ",
         "keywords": [
             "cannot breathe", "can't breathe", "struggling to breathe", "gasping for air",
-            "severe shortness of breath", "choking", "turning blue", "cyanosis", "suffocating"
+            "severe shortness of breath", "choking", "turning blue", "cyanosis", "suffocating",
+            "saans nahi aa rahi", "saans lene me takleef", "dam ghut raha hai", "saans phool rahi",
+            "सांस नहीं आ रही", "दम घुट रहा है", "सांस लेने में दिक्कत", "सांस फूल रही"
         ],
         "guidance": "Acute difficulty breathing requires immediate emergency airway and oxygen assessment."
     },
     "neurological_stroke": {
-        "label": "Acute Stroke or Neurological Deficit",
+        "label": "Acute Stroke or Neurological Deficit / स्ट्रोक या लकवा",
         "keywords": [
             "facial drooping", "face drooping", "slurred speech", "slurring words",
             "sudden arm weakness", "sudden numbness", "paralyzed on one side",
-            "loss of consciousness", "passed out", "unresponsive", "seizure", "convulsing"
+            "loss of consciousness", "passed out", "unresponsive", "seizure", "convulsing",
+            "muh tedha", "aadha shareer sunn", "behosh ho gaya", "daura pad gaya",
+            "मुंह टेढ़ा", "लकवा", "बेहोश", "दौरा पड़ना"
         ],
         "guidance": "Sudden one-sided weakness, facial drooping, or speech difficulty are potential signs of stroke."
     },
     "severe_bleeding_trauma": {
-        "label": "Uncontrolled Hemorrhage or Severe Trauma",
+        "label": "Uncontrolled Hemorrhage or Severe Trauma / अत्यधिक रक्तस्राव",
         "keywords": [
             "bleeding heavily", "uncontrolled bleeding", "spurting blood",
             "coughing up blood", "vomiting blood", "stab wound", "gunshot",
-            "head injury unconscious"
+            "head injury unconscious",
+            "khoon beh raha", "khoon ki ulti", "bahut khoon nikal raha",
+            "खून बह रहा है", "खून की उल्टी", "सिर में गहरी चोट"
         ],
         "guidance": "Heavy or uncontrollable bleeding requires urgent physical trauma care and pressure management."
     },
     "anaphylaxis_allergy": {
-        "label": "Severe Anaphylactic Allergic Reaction",
+        "label": "Severe Anaphylactic Allergic Reaction / गंभीर एलर्जिक रिएक्शन",
         "keywords": [
             "anaphylaxis", "throat closing", "tongue swelling", "lips swelling",
-            "swollen throat can't swallow", "allergic reaction throat"
+            "swollen throat can't swallow", "allergic reaction throat",
+            "gala band ho raha hai", "jeebh soojh gayi",
+            "गला बंद हो रहा है", "जीभ सूज गई", "होठ सूज गए"
         ],
         "guidance": "Rapid facial, lip, or throat swelling following an allergen indicates a potential life-threatening anaphylactic event."
     },
     "poisoning_overdose": {
-        "label": "Suspected Poisoning or Overdose",
+        "label": "Suspected Poisoning or Overdose / विषाक्तता या ओवरडोज़",
         "keywords": [
             "overdose", "drank poison", "swallowed bleach", "took all my pills",
-            "ingested chemicals", "pesticide poisoning"
+            "ingested chemicals", "pesticide poisoning",
+            "zahar pee liya", "zeher kha liya",
+            "जहर पी लिया", "जहर खा लिया", "दवाई की ओवरडोज"
         ],
         "guidance": "Suspected ingestion of toxic substances or medication overdose requires immediate emergency intervention."
     },
     "mental_health_crisis": {
-        "label": "Acute Psychiatric Crisis",
+        "label": "Acute Psychiatric Crisis / मानसिक संकट",
         "keywords": [
             "want to kill myself", "suicide", "end my life", "slit my wrists",
-            "taking my own life"
+            "taking my own life",
+            "jaan dena chahta", "aatmhatya karna", "marne ka man",
+            "आत्महत्या", "जान देना चाहता हूँ", "मरने का मन"
         ],
         "guidance": "Please reach out to emergency mental health crisis counselors immediately."
     }
