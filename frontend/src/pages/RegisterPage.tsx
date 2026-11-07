@@ -9,7 +9,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api } from '../services/api';
-import { ShieldCheck, HeartPulse, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -52,12 +52,23 @@ export const RegisterPage: React.FC = () => {
     <div className="max-w-md mx-auto px-4 py-12">
       <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 bg-teal-600 rounded-2xl flex items-center justify-center text-white mx-auto shadow-sm">
-            <HeartPulse className="w-6 h-6" />
+          <div className="w-12 h-12 bg-teal-600 rounded-2xl flex items-center justify-center text-white mx-auto shadow-sm overflow-hidden p-1.5">
+            <img
+              src="/logo.png"
+              alt="Care Connect Logo"
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                if (e.currentTarget.src.endsWith('/logo.png')) {
+                  e.currentTarget.src = '/logo.svg';
+                } else {
+                  (e.currentTarget as HTMLElement).style.display = 'none';
+                }
+              }}
+            />
           </div>
           <h1 className="text-2xl font-bold text-slate-900">Create your account</h1>
           <p className="text-xs text-slate-500">
-            Join Virtual Care to connect with doctors and manage your clinical consultations.
+            Join Care Connect to connect with doctors and manage your clinical consultations.
           </p>
         </div>
 

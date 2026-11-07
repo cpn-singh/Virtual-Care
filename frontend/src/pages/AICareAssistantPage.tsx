@@ -201,7 +201,7 @@ export const AICareAssistantPage: React.FC = () => {
           id: 'welcome',
           role: 'assistant',
           content:
-            'Hello! I am your Virtual Care Assistant. How can I help you today? You can describe your symptoms or attach a medical document (Image, PDF, Word doc).',
+            'Hello! I am your Care Connect Assistant. How can I help you today? You can describe your symptoms or attach a medical document (Image, PDF, Word doc).',
         },
       ]);
     }
@@ -399,7 +399,7 @@ export const AICareAssistantPage: React.FC = () => {
               <Bot className="w-4 h-4" />
             </div>
             <div>
-              <h1 className="text-sm font-bold text-slate-900">Virtual Care Triage & Medicine Assistant</h1>
+              <h1 className="text-sm font-bold text-slate-900">Care Connect Triage & Medicine Assistant</h1>
               <span className="text-[10px] text-teal-700 font-medium">Protocol v1.0.4 &bull; Pharmacology Engine</span>
             </div>
           </div>

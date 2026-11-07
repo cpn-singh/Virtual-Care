@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { HeartPulse, Phone, ShieldCheck, MapPin } from 'lucide-react';
+import { Phone, ShieldCheck, MapPin } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
@@ -16,11 +16,22 @@ export const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 pb-10 border-b border-slate-800">
           {/* Col 1: Brand & Purpose */}
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-teal-500 flex items-center justify-center text-slate-950 font-bold">
-                <HeartPulse className="w-5 h-5 text-slate-900" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-teal-600 flex items-center justify-center text-white font-bold overflow-hidden">
+                <img
+                  src="/logo.png"
+                  alt="Care Connect Logo"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    if (e.currentTarget.src.endsWith('/logo.png')) {
+                      e.currentTarget.src = '/logo.svg';
+                    } else {
+                      (e.currentTarget as HTMLElement).style.display = 'none';
+                    }
+                  }}
+                />
               </div>
-              <span className="text-lg font-bold text-white tracking-tight">VirtualCare</span>
+              <span className="text-lg font-bold text-white tracking-tight">Care Connect</span>
             </div>
             <p className="text-xs text-slate-400 leading-relaxed">
               Safe, accessible telemedicine bridging patients with verified clinicians.
@@ -53,7 +64,7 @@ export const Footer: React.FC = () => {
               </li>
               <li>
                 <Link to="/how-it-works" className="hover:text-white transition">
-                  How Virtual Care Works
+                  How Care Connect Works
                 </Link>
               </li>
             </ul>
@@ -111,7 +122,7 @@ export const Footer: React.FC = () => {
             consultation. If you or someone around you is experiencing chest pain, difficulty breathing, or stroke symptoms,
             please immediately contact emergency services at 112.
           </p>
-          <p>&copy; {new Date().getFullYear()} Virtual Care Health Platform. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Care Connect Health Platform. All rights reserved.</p>
         </div>
       </div>
     </footer>

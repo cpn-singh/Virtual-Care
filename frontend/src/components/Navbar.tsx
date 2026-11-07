@@ -9,7 +9,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  HeartPulse,
   Menu,
   X,
   User as UserIcon,
@@ -45,11 +44,22 @@ export const Navbar: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2.5 group">
-            <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-sm group-hover:bg-teal-700 transition">
-              <HeartPulse className="w-6 h-6" />
+            <div className="w-10 h-10 rounded-xl bg-teal-600 flex items-center justify-center text-white shadow-sm group-hover:bg-teal-700 transition overflow-hidden">
+              <img
+                src="/logo.png"
+                alt="Care Connect Logo"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  if (e.currentTarget.src.endsWith('/logo.png')) {
+                    e.currentTarget.src = '/logo.svg';
+                  } else {
+                    (e.currentTarget as HTMLElement).style.display = 'none';
+                  }
+                }}
+              />
             </div>
             <div>
-              <span className="text-lg font-bold text-slate-900 tracking-tight">VirtualCare</span>
+              <span className="text-lg font-bold text-slate-900 tracking-tight">Care Connect</span>
               <span className="block text-[10px] font-medium text-teal-700 tracking-wide uppercase">
                 Telemedicine Platform
               </span>

@@ -78,7 +78,7 @@ class OTPService:
 
         # Send notification email
         subject_map = {
-            EmailOTP.PURPOSE_REGISTRATION: "Verify your Virtual Care account",
+            EmailOTP.PURPOSE_REGISTRATION: "Verify your Care Connect account",
             EmailOTP.PURPOSE_LOGIN: "Your login verification code",
             EmailOTP.PURPOSE_PASSWORD_RESET: "Password reset verification code",
         }
@@ -86,12 +86,12 @@ class OTPService:
 
         message = (
             f"Hello,\n\n"
-            f"Your verification code for Virtual Care Telemedicine is:\n\n"
+            f"Your verification code for Care Connect Telemedicine is:\n\n"
             f"    {raw_otp}\n\n"
             f"This code will expire in {settings.OTP_EXPIRY_MINUTES} minutes.\n"
             f"If you did not make this request, you can safely ignore this email.\n\n"
             f"Warm regards,\n"
-            f"The Virtual Care Healthcare Team"
+            f"The Care Connect Healthcare Team"
         )
 
         try:

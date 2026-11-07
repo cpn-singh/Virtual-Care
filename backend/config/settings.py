@@ -196,10 +196,10 @@ if os.getenv('EMAIL_HOST'):
     EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', 'True').lower() in ('true', '1')
     EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
     EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
-    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'no-reply@virtualcare.local')
+    DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'no-reply@careconnect.local')
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-    DEFAULT_FROM_EMAIL = 'support@virtualcare.local'
+    DEFAULT_FROM_EMAIL = 'support@careconnect.local'
 
 # Healthcare Platform specific configurations
 OTP_EXPIRY_MINUTES = int(os.getenv('OTP_EXPIRY_MINUTES', 10))
