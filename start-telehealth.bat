@@ -8,7 +8,7 @@ echo [1/2] Launching Django Backend on port 8000...
 start "Care Connect Django Server" cmd /k "backend\venv\Scripts\python.exe backend\manage.py runserver 0.0.0.0:8000"
 
 echo [2/2] Launching Ngrok Static Tunnel (interlobate-isidro-palmately)...
-start "Care Connect Static Tunnel" cmd /k "ngrok http 8000"
+start "Care Connect Static Tunnel" cmd /k "ngrok.exe http --domain=interlobate-isidro-palmately.ngrok-free.dev 8000"
 
 echo.
 echo ========================================================
