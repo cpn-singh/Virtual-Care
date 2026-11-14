@@ -518,24 +518,37 @@ export const AICareAssistantPage: React.FC = () => {
                     </div>
                   )}
 
-                  {/* 2. Draft Prescription Table */}
+                  {/* 2. Draft / Normal Generic Prescription Table */}
                   {!isUser && msg.draft_prescription && msg.draft_prescription.length > 0 && (
                     <div className="mt-3 pt-2 border-t border-slate-100 space-y-2">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="font-bold text-slate-900 flex items-center gap-1.5">
-                          <FileText className="w-3.5 h-3.5 text-teal-600" />
-                          <span>Draft Prescription Summary for Doctor Review</span>
+                        <span className={`font-bold flex items-center gap-1.5 ${!msg.can_book_in_chat ? 'text-emerald-900' : 'text-slate-900'}`}>
+                          {!msg.can_book_in_chat ? (
+                            <>
+                              <Pill className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Normal Digital Prescription & Generic Medicines</span>
+                            </>
+                          ) : (
+                            <>
+                              <FileText className="w-3.5 h-3.5 text-teal-600" />
+                              <span>Clinical Formulation for Doctor Review</span>
+                            </>
+                          )}
                         </span>
-                        <span className="text-[10px] bg-slate-100 text-slate-700 px-2 py-0.5 rounded font-medium">
-                          Requires Clinician Sign-Off
+                        <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold ${
+                          !msg.can_book_in_chat
+                            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                            : 'bg-amber-50 text-amber-800 border border-amber-200'
+                        }`}>
+                          {!msg.can_book_in_chat ? 'Routine Care • No Doctor Needed' : 'Requires Clinician Sign-Off'}
                         </span>
                       </div>
 
-                      <div className="overflow-x-auto border border-slate-200 rounded-lg">
+                      <div className="overflow-x-auto border border-slate-200 rounded-lg shadow-2xs">
                         <table className="w-full text-left text-[11px] divide-y divide-slate-200">
                           <thead className="bg-slate-100 font-bold text-slate-700">
                             <tr>
-                              <th className="p-1.5">Medicine</th>
+                              <th className="p-1.5">Generic Medicine (Salt)</th>
                               <th className="p-1.5">Form</th>
                               <th className="p-1.5">Frequency</th>
                               <th className="p-1.5">Duration</th>
@@ -544,10 +557,15 @@ export const AICareAssistantPage: React.FC = () => {
                           <tbody className="divide-y divide-slate-100 bg-white">
                             {msg.draft_prescription.map((item: any, k: number) => (
                               <tr key={k}>
-                                <td className="p-1.5 font-bold text-slate-900">{item.medicine_name}</td>
-                                <td className="p-1.5">{item.formulation}</td>
-                                <td className="p-1.5">{item.frequency}</td>
-                                <td className="p-1.5">{item.duration}</td>
+                                <td className="p-1.5 font-bold text-slate-900">
+                                  <div>{item.medicine_name}</div>
+                                  {item.instructions && (
+                                    <div className="text-[10px] font-normal text-slate-500">{item.instructions}</div>
+                                  )}
+                                </td>
+                                <td className="p-1.5 text-slate-700">{item.formulation}</td>
+                                <td className="p-1.5 text-teal-800 font-medium">{item.frequency}</td>
+                                <td className="p-1.5 text-slate-700">{item.duration}</td>
                               </tr>
                             ))}
                           </tbody>
@@ -556,9 +574,14 @@ export const AICareAssistantPage: React.FC = () => {
                     </div>
                   )}
 
-                  {/* 3. In-Chat Interactive Appointment Booking Widget */}
+                  {/* 3. In-Chat Interactive Appointment Booking Widget (Serious Cases Only) */}
                   {!isUser && msg.can_book_in_chat && msg.recommended_doctor && (
-                    <div className="mt-4 pt-3 border-t-2 border-teal-500/30 bg-teal-50/70 p-4 rounded-xl border border-teal-200 space-y-3">
+                    <div className="mt-4 pt-3 border-t-2 border-amber-500/30 bg-amber-50/50 p-4 rounded-xl border border-amber-200 space-y-3">
+                      <div className="bg-amber-100/80 border border-amber-300 rounded-lg px-2.5 py-1.5 text-[11px] text-amber-900 font-bold flex items-center gap-1.5">
+                        <AlertCircle className="w-3.5 h-3.5 text-amber-700 shrink-0" />
+                        <span>Serious Clinical Case Detected • Doctor Assigned for Consultation</span>
+                      </div>
+
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
                           <div className="w-9 h-9 rounded-full bg-teal-600 text-white flex items-center justify-center font-bold text-xs">

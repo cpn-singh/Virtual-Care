@@ -10,6 +10,7 @@ from apps.appointments.views import (
     AppointmentCancelView,
     AppointmentRescheduleView,
     AppointmentJoinView,
+    AppointmentWhatsAppNotifyView,
 )
 
 urlpatterns = [
@@ -18,4 +19,5 @@ urlpatterns = [
     path('<uuid:appointment_id>/cancel/', AppointmentCancelView.as_view(), name='appointment-cancel'),
     path('<uuid:appointment_id>/reschedule/', AppointmentRescheduleView.as_view(), name='appointment-reschedule'),
     path('<uuid:appointment_id>/join/', AppointmentJoinView.as_view(), name='appointment-join'),
+    path('<uuid:appointment_id>/notify-whatsapp/', AppointmentWhatsAppNotifyView.as_view(), name='appointment-notify-whatsapp'),
 ]

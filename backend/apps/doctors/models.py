@@ -54,8 +54,60 @@ class DoctorProfile(models.Model):
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=5.00)
     total_consultations = models.PositiveIntegerField(default=0)
 
+    # WhatsApp Notifications configuration
+    whatsapp_number = models.CharField(
+        max_length=20,
+        blank=True,
+        help_text="Doctor WhatsApp phone number with country code, e.g. +919876543210"
+    )
+    whatsapp_notifications_enabled = models.BooleanField(
+        default=True,
+        help_text="Send WhatsApp alerts for new appointments and incoming video calls"
+    )
+
+    # CareConnect Institutional Email & Working Mailbox
+    careconnect_email = models.EmailField(
+        max_length=255,
+        blank=True,
+        null=True,
+        unique=True,
+        help_text="Official @careconnect.health institutional email provisioned by AI"
+    )
+    personal_email = models.EmailField(
+        max_length=255,
+        blank=True,
+        help_text="Doctor's personal/forwarding email address (receives forwarded emails)"
+    )
+    email_forwarding_enabled = models.BooleanField(
+        default=True,
+        help_text="Automatically forward CareConnect institutional emails to personal email"
+    )
+    email_provisioned_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Timestamp when official CareConnect email was provisioned"
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    @property
+    def effective_careconnect_email(self) -> str:
+        """Returns the doctor's official CareConnect institutional email."""
+        if self.careconnect_email and self.careconnect_email.strip():
+            return self.careconnect_email.strip()
+        if hasattr(self, 'user') and self.user and self.user.email and '@careconnect.' in self.user.email:
+            return self.user.email.strip()
+        return ''
+
+    @property
+    def effective_whatsapp_number(self) -> str:
+        """Returns the doctor's dedicated WhatsApp number or falls back to user phone number."""
+        if self.whatsapp_number and self.whatsapp_number.strip():
+            return self.whatsapp_number.strip()
+        if hasattr(self, 'user') and self.user and self.user.phone_number:
+            return self.user.phone_number.strip()
+        return ''
 
     class Meta:
         ordering = ['-rating', '-experience_years']

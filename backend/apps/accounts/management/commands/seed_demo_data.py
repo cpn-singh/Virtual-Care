@@ -31,6 +31,23 @@ class Command(BaseCommand):
 
         # 1. Platform Admin
         admin_user, created = User.objects.get_or_create(
+            email="chaitanyaptp24@gmail.com",
+            defaults={
+                "first_name": "Chaitanya",
+                "last_name": "Narayan",
+                "role": UserRole.ADMIN,
+                "is_staff": True,
+                "is_superuser": True,
+                "is_email_verified": True,
+            }
+        )
+        if created:
+            admin_user.set_password("AdminPass123!")
+            admin_user.save()
+            self.stdout.write(self.style.SUCCESS("Created Admin: chaitanyaptp24@gmail.com / AdminPass123!"))
+
+        # Fallback secondary admin for legacy scripts
+        legacy_admin, _ = User.objects.get_or_create(
             email="admin@example.com",
             defaults={
                 "first_name": "Platform",
@@ -41,10 +58,9 @@ class Command(BaseCommand):
                 "is_email_verified": True,
             }
         )
-        if created:
-            admin_user.set_password("AdminPass123!")
-            admin_user.save()
-            self.stdout.write(self.style.SUCCESS("Created Admin: admin@example.com / AdminPass123!"))
+        if _:
+            legacy_admin.set_password("AdminPass123!")
+            legacy_admin.save()
 
         # 2. Demo Patient
         patient_user, created = User.objects.get_or_create(
@@ -151,12 +167,14 @@ class Command(BaseCommand):
         ]
 
         created_doctors = []
-        for d in doctors_data:
+        for idx, d in enumerate(doctors_data):
+            doc_phone = f"+91 98765 {10000 + idx}"
             doc_user, u_created = User.objects.get_or_create(
                 email=d["email"],
                 defaults={
                     "first_name": d["first_name"],
                     "last_name": d["last_name"],
+                    "phone_number": doc_phone,
                     "role": UserRole.DOCTOR,
                     "is_email_verified": True,
                 }
@@ -164,6 +182,9 @@ class Command(BaseCommand):
             if u_created:
                 doc_user.set_password("DoctorPass123!")
                 doc_user.save()
+            elif not doc_user.phone_number:
+                doc_user.phone_number = doc_phone
+                doc_user.save(update_fields=['phone_number'])
 
             doc_profile, _ = DoctorProfile.objects.get_or_create(
                 user=doc_user,
@@ -176,10 +197,16 @@ class Command(BaseCommand):
                     "consultation_fee": d["fee"],
                     "bio": d["bio"],
                     "rating": d["rating"],
+                    "whatsapp_number": doc_phone,
+                    "whatsapp_notifications_enabled": True,
                     "is_verified": True,
                     "is_available_for_telehealth": True,
                 }
             )
+            if not doc_profile.whatsapp_number:
+                doc_profile.whatsapp_number = doc_phone
+                doc_profile.whatsapp_notifications_enabled = True
+                doc_profile.save(update_fields=['whatsapp_number', 'whatsapp_notifications_enabled'])
             created_doctors.append(doc_profile)
 
             # Weekly availability slots (Monday through Saturday)

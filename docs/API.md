@@ -174,3 +174,56 @@ Format: `application/json`
 ### List Invoices
 `GET /api/v1/invoices/`  
 **Auth:** `Authorization: Bearer <token>`
+
+---
+
+## 7. WhatsApp Notifications for Clinicians
+
+### Automated Alerts
+1. **Appointment Confirmed Alert**: Dispatched to attending doctor's WhatsApp immediately when a patient schedules an appointment.
+2. **Video Consultation Call Alert**: Dispatched to attending doctor's WhatsApp when patient joins the waiting room, containing the direct clickable video encounter link.
+
+### Trigger / Resend WhatsApp Appointment or Call Alert
+`POST /api/v1/appointments/<uuid:id>/notify-whatsapp/`  
+**Auth:** `Authorization: Bearer <token>`  
+**Payload (optional):**
+```json
+{
+  "alert_type": "video_call" // or "appointment"
+}
+```
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "WhatsApp notification dispatched to doctor.",
+  "data": {
+    "success": true,
+    "provider": "simulated",
+    "recipient": "+919876510000",
+    "wa_link": "https://wa.me/919876510000?text=...",
+    "status": "delivered"
+  }
+}
+```
+
+### Test WhatsApp Integration
+`POST /api/v1/notifications/whatsapp/test/`  
+**Auth:** `Authorization: Bearer <token>`  
+**Payload (optional):**
+```json
+{
+  "phone_number": "+919876543210"
+}
+```
+
+### Doctor Profile WhatsApp Preferences
+`PATCH /api/v1/doctors/me/profile/`  
+**Auth:** `Authorization: Bearer <doctor_token>`  
+**Payload:**
+```json
+{
+  "whatsapp_number": "+919876543210",
+  "whatsapp_notifications_enabled": true
+}
+```

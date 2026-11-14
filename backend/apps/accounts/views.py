@@ -204,6 +204,14 @@ class LoginView(APIView):
         password = serializer.validated_data['password']
 
         user = User.objects.filter(email=email).first()
+        if not user:
+            from apps.doctors.models import DoctorProfile
+            from django.db.models import Q
+            doc_profile = DoctorProfile.objects.filter(
+                Q(careconnect_email__iexact=email) | Q(personal_email__iexact=email)
+            ).select_related('user').first()
+            if doc_profile and doc_profile.user:
+                user = doc_profile.user
         if not user or not user.check_password(password):
             return error_response(
                 message="Invalid email or password. Please verify your credentials.",

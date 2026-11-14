@@ -24,6 +24,7 @@ import {
   User as UserIcon,
   AlertCircle,
   CheckCircle2,
+  MessageSquare,
 } from 'lucide-react';
 
 export const ConsultationRoomPage: React.FC = () => {
@@ -34,6 +35,8 @@ export const ConsultationRoomPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [consultationData, setConsultationData] = useState<any>(null);
+  const [isNotifyingWA, setIsNotifyingWA] = useState<boolean>(false);
+  const [waNotice, setWaNotice] = useState<string>('');
 
   // Pre-call readiness
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean>(true);
@@ -74,6 +77,23 @@ export const ConsultationRoomPage: React.FC = () => {
 
   const handleStartCall = () => {
     setIsInCall(true);
+  };
+
+  const handleNotifyDoctorWhatsApp = async () => {
+    if (!appointmentId) return;
+    setIsNotifyingWA(true);
+    setWaNotice('');
+    try {
+      const res: any = await api.appointments.sendWhatsAppAlert(appointmentId, 'video_call');
+      setWaNotice(`Doctor alerted on WhatsApp (${res?.data?.recipient || 'registered phone'})!`);
+      if (res?.data?.wa_link && user?.role === 'patient') {
+        window.open(res.data.wa_link, '_blank', 'noopener,noreferrer');
+      }
+    } catch {
+      setWaNotice('Could not send WhatsApp alert.');
+    } finally {
+      setIsNotifyingWA(false);
+    }
   };
 
   const handleEndCall = async () => {
@@ -206,6 +226,24 @@ export const ConsultationRoomPage: React.FC = () => {
               <span>Room ID:</span>
               <span className="font-mono text-[11px] text-slate-500">{roomName}</span>
             </div>
+          </div>
+
+          {/* WhatsApp Doctor Alert Indicator */}
+          <div className="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 text-xs text-emerald-900 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-left">
+            <div className="flex items-center gap-2">
+              <MessageSquare className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>
+                {waNotice || `Dr. ${consultationData?.doctor_name || 'your clinician'} has been notified on WhatsApp with the direct room link.`}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleNotifyDoctorWhatsApp}
+              disabled={isNotifyingWA}
+              className="bg-emerald-700 hover:bg-emerald-800 disabled:bg-slate-300 text-white font-bold text-[11px] px-3 py-1.5 rounded-xl shrink-0 transition"
+            >
+              {isNotifyingWA ? 'Alerting...' : 'Alert Doctor on WhatsApp'}
+            </button>
           </div>
 
           <button

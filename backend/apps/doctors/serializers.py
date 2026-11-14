@@ -34,6 +34,7 @@ class DoctorPublicListSerializer(serializers.ModelSerializer):
     """Clean serializer for public discovery."""
     user = UserSummarySerializer(read_only=True)
     specialization = SpecializationSerializer(read_only=True)
+    effective_careconnect_email = serializers.ReadOnlyField()
 
     class Meta:
         model = DoctorProfile
@@ -50,6 +51,8 @@ class DoctorPublicListSerializer(serializers.ModelSerializer):
             'is_available_for_telehealth',
             'rating',
             'total_consultations',
+            'careconnect_email',
+            'effective_careconnect_email',
         ]
 
 
@@ -59,6 +62,8 @@ class DoctorProfileMeSerializer(serializers.ModelSerializer):
     specialization_id = serializers.UUIDField(write_only=True, required=False, allow_null=True)
     specialization = SpecializationSerializer(read_only=True)
     availability_slots = DoctorAvailabilitySerializer(many=True, read_only=True)
+    effective_whatsapp_number = serializers.ReadOnlyField()
+    effective_careconnect_email = serializers.ReadOnlyField()
 
     class Meta:
         model = DoctorProfile
@@ -78,11 +83,30 @@ class DoctorProfileMeSerializer(serializers.ModelSerializer):
             'is_available_for_telehealth',
             'rating',
             'total_consultations',
+            'whatsapp_number',
+            'whatsapp_notifications_enabled',
+            'effective_whatsapp_number',
+            'careconnect_email',
+            'personal_email',
+            'effective_careconnect_email',
+            'email_forwarding_enabled',
+            'email_provisioned_at',
             'availability_slots',
             'created_at',
             'updated_at',
         ]
-        read_only_fields = ['id', 'user', 'is_verified', 'rating', 'total_consultations', 'created_at', 'updated_at']
+        read_only_fields = [
+            'id',
+            'user',
+            'is_verified',
+            'rating',
+            'total_consultations',
+            'effective_whatsapp_number',
+            'effective_careconnect_email',
+            'email_provisioned_at',
+            'created_at',
+            'updated_at'
+        ]
 
     def update(self, instance, validated_data):
         spec_id = validated_data.pop('specialization_id', None)

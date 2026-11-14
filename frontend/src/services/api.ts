@@ -118,6 +118,10 @@ class ApiService {
     addAvailability: (data: any) => this.request<any>('/doctors/me/availability/', { method: 'POST', body: JSON.stringify(data) }),
     adminCreate: (payload: any) =>
       this.request<any>('/doctors/admin-create/', { method: 'POST', body: JSON.stringify(payload) }),
+    aiGenerateEmail: (payload: { first_name: string; last_name: string }) =>
+      this.request<any>('/doctors/ai-generate-email/', { method: 'POST', body: JSON.stringify(payload) }),
+    aiProvisionAllDoctors: () =>
+      this.request<any>('/doctors/ai-provision-all/', { method: 'POST' }),
   };
 
   // --- Appointment Endpoints ---
@@ -133,6 +137,11 @@ class ApiService {
         body: JSON.stringify({ scheduled_date: date, scheduled_time: time }),
       }),
     join: (id: string) => this.request<any>(`/appointments/${id}/join/`, { method: 'POST' }),
+    sendWhatsAppAlert: (id: string, alertType: 'appointment' | 'video_call' = 'appointment') =>
+      this.request<any>(`/appointments/${id}/notify-whatsapp/`, {
+        method: 'POST',
+        body: JSON.stringify({ alert_type: alertType }),
+      }),
   };
 
   // --- Consultation Endpoints ---
@@ -222,6 +231,11 @@ class ApiService {
   public notifications = {
     list: () => this.request<any>('/notifications/'),
     markAllRead: () => this.request<any>('/notifications/', { method: 'POST' }),
+    testWhatsApp: (phoneNumber?: string) =>
+      this.request<any>('/notifications/whatsapp/test/', {
+        method: 'POST',
+        body: JSON.stringify({ phone_number: phoneNumber }),
+      }),
   };
 }
 

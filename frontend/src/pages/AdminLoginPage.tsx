@@ -97,12 +97,25 @@ export const AdminLoginPage: React.FC = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full text-xs border border-slate-300 rounded-xl p-3 focus:outline-none focus:ring-2 focus:ring-teal-500 font-mono"
-              placeholder="admin@example.com"
+              placeholder="chaitanyaptp24@gmail.com"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Password</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-xs font-bold text-slate-700">Password</label>
+              <button
+                type="button"
+                onClick={() => {
+                  setEmail('chaitanyaptp24@gmail.com');
+                  setPassword('AdminPass123!');
+                  setErrorMsg('');
+                }}
+                className="text-[11px] text-teal-700 font-semibold hover:underline"
+              >
+                Autofill Admin
+              </button>
+            </div>
             <input
               type="password"
               required

@@ -92,7 +92,7 @@ For effortless testing, the database comes pre-seeded with synthetic accounts. Y
 | :--- | :--- | :--- | :--- |
 | **Patient** | `patient@example.com` | `PatientPass123!` | Book appointments, AI triage, video room, download prescriptions, view invoices |
 | **Doctor** | `doctor@example.com` | `DoctorPass123!` | View patient appointments, enter video room, write clinical notes, issue prescriptions |
-| **Admin** | `admin@example.com` | `AdminPass123!` | Operations dashboard, verify doctors, oversee clinical compliance |
+| **Admin** | `chaitanyaptp24@gmail.com` (or `admin@example.com`) | `AdminPass123!` | Operations dashboard, verify doctors, oversee clinical compliance |
 
 ---
 

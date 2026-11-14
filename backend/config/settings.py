@@ -213,3 +213,16 @@ AMBULANCE_PHONE_NUMBER = os.getenv('AMBULANCE_PHONE_NUMBER', '108')
 # Mock AI / Real AI provider toggle
 AI_PROVIDER = os.getenv('AI_PROVIDER', 'rules_and_simulated')  # 'rules_and_simulated' or 'gemini'
 AI_API_KEY = os.getenv('AI_API_KEY', '')
+
+# WhatsApp Notification Configuration (Doctors: Appointment & Video Call Alerts)
+# Supported providers: 'twilio' (Twilio WhatsApp API), 'meta' (WhatsApp Cloud API), or 'simulated' (console + in-app)
+WHATSAPP_PROVIDER = os.getenv('WHATSAPP_PROVIDER', 'simulated')
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', '')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '')
+TWILIO_WHATSAPP_FROM = os.getenv('TWILIO_WHATSAPP_FROM', '+14155238886')
+WHATSAPP_CLOUD_API_TOKEN = os.getenv('WHATSAPP_CLOUD_API_TOKEN', '')
+WHATSAPP_PHONE_NUMBER_ID = os.getenv('WHATSAPP_PHONE_NUMBER_ID', '')
+FRONTEND_APP_URL = os.getenv('FRONTEND_APP_URL', 'http://localhost:3000')
+
+# CareConnect Official Doctor Email & Mailbox Domain
+CARECONNECT_EMAIL_DOMAIN = os.getenv('CARECONNECT_EMAIL_DOMAIN', 'careconnect.health')

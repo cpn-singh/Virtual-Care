@@ -12,7 +12,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
-import { Appointment, PrescriptionItem } from '../types';
+import { Appointment, PrescriptionItem, Doctor } from '../types';
 import {
   Calendar,
   Video,
@@ -24,6 +24,11 @@ import {
   AlertCircle,
   Clock,
   User as UserIcon,
+  MessageSquare,
+  Smartphone,
+  ExternalLink,
+  Send,
+  BellRing,
 } from 'lucide-react';
 import { Modal } from '../components/Modal';
 
@@ -31,6 +36,15 @@ export const DoctorDashboard: React.FC = () => {
   const { user } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [doctorProfile, setDoctorProfile] = useState<Doctor | null>(null);
+
+  // WhatsApp Notification Settings State
+  const [whatsappNumber, setWhatsappNumber] = useState<string>('');
+  const [whatsappEnabled, setWhatsappEnabled] = useState<boolean>(true);
+  const [isSavingWhatsApp, setIsSavingWhatsApp] = useState<boolean>(false);
+  const [whatsAppFeedback, setWhatsAppFeedback] = useState<{ type: 'success' | 'error'; text: string; link?: string } | null>(null);
+  const [activeAlertLoadingId, setActiveAlertLoadingId] = useState<string | null>(null);
+  const [actionNotice, setActionNotice] = useState<string | null>(null);
 
   // Prescription Authoring Modal State
   const [activeApptForRx, setActiveApptForRx] = useState<Appointment | null>(null);
@@ -54,9 +68,21 @@ export const DoctorDashboard: React.FC = () => {
   const loadDoctorData = async () => {
     setIsLoading(true);
     try {
-      const res: any = await api.appointments.list();
-      if (res?.data) {
-        setAppointments(res.data);
+      const [apptRes, profileRes]: [any, any] = await Promise.allSettled([
+        api.appointments.list(),
+        api.doctors.getMyProfile(),
+      ]).then((results) => [
+        results[0].status === 'fulfilled' ? results[0].value : null,
+        results[1].status === 'fulfilled' ? results[1].value : null,
+      ]);
+
+      if (apptRes?.data) {
+        setAppointments(apptRes.data);
+      }
+      if (profileRes?.data) {
+        setDoctorProfile(profileRes.data);
+        setWhatsappNumber(profileRes.data.whatsapp_number || profileRes.data.effective_whatsapp_number || '');
+        setWhatsappEnabled(profileRes.data.whatsapp_notifications_enabled ?? true);
       }
     } catch {
       // Fallback
@@ -68,6 +94,75 @@ export const DoctorDashboard: React.FC = () => {
   useEffect(() => {
     loadDoctorData();
   }, []);
+
+  const handleSaveWhatsAppPreferences = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingWhatsApp(true);
+    setWhatsAppFeedback(null);
+    try {
+      const res: any = await api.doctors.updateMyProfile({
+        whatsapp_number: whatsappNumber,
+        whatsapp_notifications_enabled: whatsappEnabled,
+      });
+      if (res?.data) {
+        setDoctorProfile(res.data);
+      }
+      setWhatsAppFeedback({
+        type: 'success',
+        text: 'WhatsApp notification preferences updated successfully!',
+      });
+    } catch (err: any) {
+      setWhatsAppFeedback({
+        type: 'error',
+        text: err.message || 'Failed to update WhatsApp preferences.',
+      });
+    } finally {
+      setIsSavingWhatsApp(false);
+    }
+  };
+
+  const handleSendTestWhatsApp = async () => {
+    setIsSavingWhatsApp(true);
+    setWhatsAppFeedback(null);
+    try {
+      const res: any = await api.notifications.testWhatsApp(whatsappNumber);
+      const link = res?.data?.wa_link;
+      setWhatsAppFeedback({
+        type: 'success',
+        text: `Test alert dispatched to ${whatsappNumber || doctorProfile?.effective_whatsapp_number || 'your registered phone'}!`,
+        link,
+      });
+    } catch (err: any) {
+      setWhatsAppFeedback({
+        type: 'error',
+        text: err.message || 'Failed to dispatch test WhatsApp notification.',
+      });
+    } finally {
+      setIsSavingWhatsApp(false);
+    }
+  };
+
+  const handleSendAppointmentWhatsApp = async (apptId: string, alertType: 'appointment' | 'video_call') => {
+    setActiveAlertLoadingId(`${apptId}-${alertType}`);
+    setActionNotice(null);
+    try {
+      const res: any = await api.appointments.sendWhatsAppAlert(apptId, alertType);
+      const waLink = res?.data?.wa_link;
+      const recipient = res?.data?.recipient;
+      setActionNotice(
+        alertType === 'video_call'
+          ? `Video call alert sent to ${recipient}! Tap WhatsApp link to view.`
+          : `Appointment details sent to ${recipient} via WhatsApp!`
+      );
+      if (waLink) {
+        window.open(waLink, '_blank', 'noopener,noreferrer');
+      }
+    } catch (err: any) {
+      setActionNotice(err.message || 'Failed to send WhatsApp alert.');
+    } finally {
+      setActiveAlertLoadingId(null);
+    }
+  };
 
   const handleAddItem = () => {
     setItems([
@@ -134,8 +229,126 @@ export const DoctorDashboard: React.FC = () => {
           <span>Doctor Consultation Portal: Dr. {user?.full_name}</span>
         </h1>
         <p className="text-xs text-slate-600">
-          Conduct authorized video encounters, record clinical observations, and sign digital prescriptions.
+          Conduct authorized video encounters, record clinical observations, and receive real-time WhatsApp alerts.
         </p>
+      </div>
+
+      {/* Action Notification Banner */}
+      {actionNotice && (
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 px-4 py-3 rounded-2xl text-xs font-semibold flex items-center justify-between shadow-xs">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span>{actionNotice}</span>
+          </div>
+          <button
+            onClick={() => setActionNotice(null)}
+            className="text-emerald-700 hover:text-emerald-900 text-xs font-bold"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      {/* WhatsApp Clinician Notifications Configuration Card */}
+      <div className="bg-gradient-to-br from-emerald-50/70 via-white to-teal-50/50 border border-emerald-200/80 rounded-2xl p-6 shadow-xs space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-emerald-100 pb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 bg-emerald-600 text-white rounded-xl shadow-xs">
+              <MessageSquare className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <span>WhatsApp Notification Center</span>
+                <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-300">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  {whatsappEnabled ? 'Automated Alerts Enabled' : 'Alerts Disabled'}
+                </span>
+              </h2>
+              <p className="text-xs text-slate-600">
+                Receive instant WhatsApp alerts for <strong>new patient bookings</strong> and <strong>incoming video calls</strong>.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={handleSaveWhatsAppPreferences} className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
+          <div className="md:col-span-5 space-y-1">
+            <label className="block text-xs font-bold text-slate-700 flex items-center gap-1.5">
+              <Smartphone className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Doctor WhatsApp Number (with Country Code)</span>
+            </label>
+            <input
+              type="tel"
+              value={whatsappNumber}
+              onChange={(e) => setWhatsappNumber(e.target.value)}
+              placeholder="e.g. +91 98765 43210"
+              className="w-full text-xs font-mono font-medium border border-slate-300 rounded-xl px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-2xs"
+            />
+          </div>
+
+          <div className="md:col-span-4 flex items-center gap-2.5 py-2">
+            <input
+              type="checkbox"
+              id="waToggle"
+              checked={whatsappEnabled}
+              onChange={(e) => setWhatsappEnabled(e.target.checked)}
+              className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500"
+            />
+            <label htmlFor="waToggle" className="text-xs font-semibold text-slate-700 cursor-pointer">
+              Enable WhatsApp Alerts for Appointments & Video Calls
+            </label>
+          </div>
+
+          <div className="md:col-span-3 flex items-center gap-2">
+            <button
+              type="submit"
+              disabled={isSavingWhatsApp}
+              className="flex-1 bg-emerald-700 hover:bg-emerald-800 disabled:bg-slate-300 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-xs text-center"
+            >
+              {isSavingWhatsApp ? 'Saving...' : 'Save Phone'}
+            </button>
+            <button
+              type="button"
+              onClick={handleSendTestWhatsApp}
+              disabled={isSavingWhatsApp}
+              className="bg-white hover:bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-xs flex items-center gap-1"
+              title="Send a sample WhatsApp alert to test integration"
+            >
+              <Send className="w-3 h-3" />
+              <span>Test</span>
+            </button>
+          </div>
+        </form>
+
+        {whatsAppFeedback && (
+          <div
+            className={`p-3 rounded-xl text-xs font-medium flex items-center justify-between gap-3 ${
+              whatsAppFeedback.type === 'success'
+                ? 'bg-emerald-100/70 border border-emerald-300 text-emerald-900'
+                : 'bg-red-50 border border-red-200 text-red-800'
+            }`}
+          >
+            <div className="flex items-center gap-2">
+              {whatsAppFeedback.type === 'success' ? (
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              ) : (
+                <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
+              )}
+              <span>{whatsAppFeedback.text}</span>
+            </div>
+            {whatsAppFeedback.link && (
+              <a
+                href={whatsAppFeedback.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-emerald-700 text-white font-bold text-[11px] px-3 py-1 rounded-lg flex items-center gap-1 hover:bg-emerald-800 shrink-0"
+              >
+                <span>Open in WhatsApp</span>
+                <ExternalLink className="w-3 h-3" />
+              </a>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Appointments List */}
@@ -193,6 +406,31 @@ export const DoctorDashboard: React.FC = () => {
                     <Video className="w-3.5 h-3.5" />
                     <span>Join Video Room</span>
                   </Link>
+
+                  <button
+                    onClick={() => handleSendAppointmentWhatsApp(appt.id, 'video_call')}
+                    disabled={activeAlertLoadingId === `${appt.id}-video_call`}
+                    className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-xs"
+                    title="Send instant video call room link to Doctor's WhatsApp"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" />
+                    <span>
+                      {activeAlertLoadingId === `${appt.id}-video_call` ? 'Sending...' : 'WhatsApp Call Alert'}
+                    </span>
+                  </button>
+
+                  {appt.doctor_whatsapp_link && (
+                    <a
+                      href={appt.doctor_whatsapp_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-xs px-3 py-2 rounded-xl transition flex items-center gap-1 shadow-2xs"
+                      title="Open appointment details in WhatsApp"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5 text-emerald-700" />
+                      <span>Chat</span>
+                    </a>
+                  )}
 
                   <button
                     onClick={() => {

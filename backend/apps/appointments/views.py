@@ -20,6 +20,7 @@ from apps.appointments.serializers import (
 from apps.doctors.models import DoctorProfile
 from apps.patients.models import PatientProfile
 from apps.consultations.services.video_service import VideoService
+from apps.notifications.services.whatsapp_service import WhatsAppService
 from common.roles import UserRole
 from common.responses import success_response, error_response
 
@@ -84,6 +85,12 @@ class AppointmentListCreateView(APIView):
             status=Appointment.STATUS_CONFIRMED,
             payment_status=Appointment.PAYMENT_PENDING
         )
+
+        # Notify attending doctor on WhatsApp
+        try:
+            WhatsAppService.send_appointment_booked_doctor_alert(appointment)
+        except Exception:
+            pass
 
         return success_response(
             data=AppointmentSerializer(appointment).data,
@@ -225,6 +232,15 @@ class AppointmentJoinView(APIView):
             consultation.status = 'active'
             consultation.save(update_fields=['started_at', 'status'])
 
+        # If patient joins, notify doctor on WhatsApp immediately with direct room link
+        if user.role == UserRole.PATIENT or appointment.patient.user == user:
+            try:
+                frontend_url = getattr(settings, 'FRONTEND_APP_URL', 'http://localhost:3000').rstrip('/')
+                room_url = f"{frontend_url}/consultation/{appointment.id}"
+                WhatsAppService.send_video_call_doctor_alert(appointment, room_url=room_url)
+            except Exception:
+                pass
+
         credentials = VideoService.generate_access_credentials(consultation, user)
 
         return success_response(
@@ -236,4 +252,43 @@ class AppointmentJoinView(APIView):
                 "doctor_name": appointment.doctor.user.full_name,
             },
             message="Room access authorized."
+        )
+
+
+class AppointmentWhatsAppNotifyView(APIView):
+    """
+    POST /api/v1/appointments/<id>/notify-whatsapp/
+    Manually triggers or resends a WhatsApp alert to the attending doctor
+    for this appointment or video call session.
+    Payload: {"alert_type": "appointment" | "video_call"}
+    """
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, appointment_id):
+        appointment = Appointment.objects.select_related(
+            'doctor__user', 'patient__user'
+        ).filter(id=appointment_id).first()
+
+        if not appointment:
+            return error_response(message="Appointment not found.", http_status=status.HTTP_404_NOT_FOUND)
+
+        user = request.user
+        is_participant = (appointment.patient.user == user or appointment.doctor.user == user or user.role == UserRole.ADMIN)
+        if not is_participant:
+            return error_response(
+                message="You are not authorized to send alerts for this appointment.",
+                http_status=status.HTTP_403_FORBIDDEN
+            )
+
+        alert_type = request.data.get('alert_type', 'appointment')
+        if alert_type == 'video_call':
+            frontend_url = getattr(settings, 'FRONTEND_APP_URL', 'http://localhost:3000').rstrip('/')
+            room_url = f"{frontend_url}/consultation/{appointment.id}"
+            res = WhatsAppService.send_video_call_doctor_alert(appointment, room_url=room_url)
+        else:
+            res = WhatsAppService.send_appointment_booked_doctor_alert(appointment)
+
+        return success_response(
+            data=res,
+            message="WhatsApp notification dispatched to doctor."
         )

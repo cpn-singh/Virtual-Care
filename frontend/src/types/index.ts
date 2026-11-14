@@ -41,6 +41,14 @@ export interface Doctor {
   is_available_for_telehealth: boolean;
   rating: string | number;
   total_consultations: number;
+  whatsapp_number?: string;
+  whatsapp_notifications_enabled?: boolean;
+  effective_whatsapp_number?: string;
+  careconnect_email?: string;
+  personal_email?: string;
+  effective_careconnect_email?: string;
+  email_forwarding_enabled?: boolean;
+  email_provisioned_at?: string;
 }
 
 export interface DoctorAvailability {
@@ -92,6 +100,19 @@ export interface Appointment {
   reason_for_visit: string;
   patient_symptoms_summary?: string;
   cancellation_reason?: string;
+  doctor_whatsapp_link?: string;
+  created_at: string;
+}
+
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  notification_type: 'appointment' | 'videocall' | 'prescription' | 'payment' | 'emergency' | 'system';
+  channel?: 'in_app' | 'whatsapp' | 'both';
+  whatsapp_status?: string;
+  metadata?: Record<string, any>;
+  is_read: boolean;
   created_at: string;
 }
 
