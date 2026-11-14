@@ -18,4 +18,4 @@ Disallow: /prescriptions/
 Disallow: /invoices/
 
 # Sitemap Location for Google Search Console & Search Crawlers
-Sitemap: https://careconnect.health/sitemap.xml
+Sitemap: https://virtual-care-gamma.vercel.app/sitemap.xml
