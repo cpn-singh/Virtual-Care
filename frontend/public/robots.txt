@@ -1,0 +1,21 @@
+# Robots.txt for CareConnect Telemedicine Platform
+User-agent: *
+Allow: /
+Allow: /doctors
+Allow: /ai-care
+Allow: /how-it-works
+Allow: /emergency
+Allow: /login
+Allow: /register
+
+# Disallow authenticated private patient/doctor/admin portals
+Disallow: /patient/
+Disallow: /doctor/
+Disallow: /admin/
+Disallow: /consultation/
+Disallow: /appointments/
+Disallow: /prescriptions/
+Disallow: /invoices/
+
+# Sitemap Location for Google Search Console & Search Crawlers
+Sitemap: https://careconnect.health/sitemap.xml
